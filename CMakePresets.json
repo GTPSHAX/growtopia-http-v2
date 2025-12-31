@@ -1,0 +1,92 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "debug-x64",
+      "displayName": "Debug - x64",
+      "description": "Configure for Debug (x64)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "debug-x86",
+      "displayName": "Debug - x86",
+      "description": "Configure for Debug (x86 / 32-bit)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/debug-x86",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS": "-m32",
+        "CMAKE_CXX_FLAGS": "-m32",
+        "CMAKE_EXE_LINKER_FLAGS": "-m32",
+        "CMAKE_SHARED_LINKER_FLAGS": "-m32"
+      }
+    },
+    {
+      "name": "release-x64",
+      "displayName": "Release - x64",
+      "description": "Configure for Release (x64) - optimized & stripped",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release-x64",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_FLAGS_RELEASE": "-O3 -march=native -flto -fvisibility=hidden -fstack-protector-strong -ffunction-sections -fdata-sections",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O3 -march=native -flto -fvisibility=hidden -fstack-protector-strong -ffunction-sections -fdata-sections",
+        "CMAKE_EXE_LINKER_FLAGS": "-Wl,--gc-sections -Wl,-s -flto",
+        "CMAKE_SHARED_LINKER_FLAGS": "-Wl,--gc-sections -Wl,-s -flto"
+      }
+    },
+    {
+      "name": "release-x86",
+      "displayName": "Release - x86",
+      "description": "Configure for Release (x86 / 32-bit) - optimized & stripped",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release-x86",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_FLAGS_RELEASE": "-m32 -O3 -flto -fvisibility=hidden -fstack-protector-strong -ffunction-sections -fdata-sections",
+        "CMAKE_CXX_FLAGS_RELEASE": "-m32 -O3 -flto -fvisibility=hidden -fstack-protector-strong -ffunction-sections -fdata-sections",
+        "CMAKE_EXE_LINKER_FLAGS": "-m32 -Wl,--gc-sections -Wl,-s -flto",
+        "CMAKE_SHARED_LINKER_FLAGS": "-m32 -Wl,--gc-sections -Wl,-s -flto"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-debug-x64",
+      "configurePreset": "debug-x64"
+    },
+    {
+      "name": "build-debug-x86",
+      "configurePreset": "debug-x86"
+    },
+    {
+      "name": "build-release-x64",
+      "configurePreset": "release-x64"
+    },
+    {
+      "name": "build-release-x86",
+      "configurePreset": "release-x86"
+    },
+    {
+      "name": "test",
+      "description": "",
+      "displayName": "",
+      "inherits": [
+        "build-debug-x64",
+        "build-debug-x86",
+        "build-release-x64",
+        "build-release-x86"
+      ]
+    },
+    {
+      "name": "release x64",
+      "description": "",
+      "displayName": "",
+      "configurePreset": "release-x64"
+    }
+  ]
+}

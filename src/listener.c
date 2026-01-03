@@ -1,4 +1,5 @@
 #include "growtopia/listener.h"
+#include "growtopia/security.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,6 +24,8 @@ static void on_accept_uv(uv_stream_t *listener_stream, int status)
 {
     uv_tcp_t *conn;
     h2o_socket_t *sock;
+    struct sockaddr_storage addr;
+    int addr_len = sizeof(addr);
 
     if (status != 0)
         return;
@@ -33,6 +36,18 @@ static void on_accept_uv(uv_stream_t *listener_stream, int status)
     if (uv_accept(listener_stream, (uv_stream_t *)conn) != 0) {
         uv_close((uv_handle_t *)conn, (uv_close_cb)free);
         return;
+    }
+
+    /* Get peer address for security checks */
+    if (uv_tcp_getpeername(conn, (struct sockaddr *)&addr, &addr_len) == 0) {
+        /* Check if connection is allowed */
+        if (!security_check_connection((struct sockaddr *)&addr)) {
+            /* Connection blocked by security */
+            uv_close((uv_handle_t *)conn, (uv_close_cb)free);
+            return;
+        }
+        /* Register the connection */
+        security_register_connection((struct sockaddr *)&addr);
     }
 
     sock = h2o_uv_socket_create((uv_handle_t *)conn, (uv_close_cb)free);

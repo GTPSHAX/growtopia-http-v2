@@ -1,0 +1,32 @@
+{
+  "name": "Growtopia HTTP Server Dev Container",
+  "image": "mcr.microsoft.com/devcontainers/cpp:ubuntu",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true
+    }
+  },
+  
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y cmake build-essential libssl-dev libuv1-dev clang-format clang-tidy && ./scripts/setup.sh",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools-extension-pack",
+        "xaver.clang-format",
+        "notskm.clang-tidy"
+      ],
+      "settings": {
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+      }
+    }
+  },
+  
+  "forwardPorts": [8000],
+  
+  "remoteUser": "vscode"
+}

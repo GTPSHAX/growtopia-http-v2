@@ -8,22 +8,18 @@ set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS}")
 
 # Output directory configuration
-# Default to project-root `dist/` so built binaries and libs are colocated in a single place
-set(DEFAULT_OUT_DIR "${CMAKE_SOURCE_DIR}/dist" CACHE PATH "Default output/install directory")
-# runtime (executables)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${DEFAULT_OUT_DIR}/bin")
-# shared libs (and DLLs on Windows)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${DEFAULT_OUT_DIR}/lib")
-# static libraries / archives
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${DEFAULT_OUT_DIR}/lib")
+# Binaries go to dist/bin/, intermediate build files to build/
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist/bin")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build")
 
-# Install prefix defaults to the same out directory (can be overridden by -DCMAKE_INSTALL_PREFIX)
+# Install prefix
 if (NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${DEFAULT_OUT_DIR}" CACHE PATH "Installation prefix" FORCE)
+  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}" CACHE PATH "Installation prefix" FORCE)
 endif()
 
 include_directories(
-  src/
+  include
   externals/h2o/include
   externals/h2o/deps/picotls/include
   externals/h2o/deps/quicly/include
@@ -39,7 +35,7 @@ add_executable(server
 )
 
 # Build a small internal library for app handlers and helpers
-add_library(growtopia STATIC src/handlers.c src/listener.c)
+add_library(growtopia STATIC src/handlers.c src/listener.c src/security.c)
 target_include_directories(growtopia PUBLIC ${PROJECT_SOURCE_DIR}/include)
 # Ensure POSIX feature macros and pthread linkage are visible when building the library
 target_compile_definitions(growtopia PRIVATE _POSIX_C_SOURCE=200809L)
@@ -52,7 +48,7 @@ target_link_libraries(server PRIVATE Threads::Threads)
 
 # expose server config as a PCH for fast iteration (optional)
 target_precompile_headers(server PRIVATE
-  src/config/server.h
+  include/growtopia/config/server.h
 )
 
 # link the app library and external deps

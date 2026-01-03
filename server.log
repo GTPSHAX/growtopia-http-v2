@@ -1,0 +1,8 @@
+an error occurred while trying to load server certificate file:certs/localhost.pem
+Security module initialized:
+  Max connections per IP: 50
+  Max requests per second: 100
+  Ban duration: 600 seconds
+  Rate limiting: disabled
+  Auto-ban: disabled
+DDoS/DoS protection enabled

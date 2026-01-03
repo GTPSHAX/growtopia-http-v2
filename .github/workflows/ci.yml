@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            build-essential \
+            libssl-dev \
+            libuv1-dev \
+            clang-format \
+            clang-tidy
+
+      - name: Configure CMake
+        run: cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -B build -S .
+
+      - name: Build
+        run: cmake --build build -j$(nproc)
+
+      - name: Check formatting
+        run: |
+          find src include -type f \( -name "*.c" -o -name "*.h" \) \
+            -exec clang-format --dry-run --Werror {} \;
+
+      - name: Run clang-tidy
+        run: |
+          find src -type f -name "*.c" -exec clang-tidy {} \; || true
+
+    # Uncomment when tests are added
+    # - name: Run tests
+    #   run: cd build && ctest --output-on-failure

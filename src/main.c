@@ -38,6 +38,8 @@
 
 #include "growtopia/handlers.h"
 #include "growtopia/listener.h"
+#include "growtopia/security.h"
+#include "growtopia/config/server.h"
 
 static h2o_globalconf_t config;
 static h2o_context_t ctx;
@@ -186,6 +188,11 @@ int main(int argc, char **argv)
     h2o_config_init(&config);
     hostconf = h2o_config_register_host(&config, h2o_iovec_init(H2O_STRLIT("default")), 65535);
 
+    /* Security statistics endpoint */
+    pathconf = register_handler(hostconf, "/security-stats", security_stats_handler);
+    if (logfh != NULL)
+        h2o_access_log_register(pathconf, logfh);
+
     pathconf = register_handler(hostconf, "/post-test", post_test);
     if (logfh != NULL)
         h2o_access_log_register(pathconf, logfh);
@@ -215,6 +222,16 @@ int main(int argc, char **argv)
 #else
     h2o_context_init(&ctx, h2o_evloop_create(), &config);
 #endif
+
+    /* Initialize DDoS/DoS security module */
+    server_config_t srv_config = server_get_default_config();
+    
+    if (security_init(&ctx, &srv_config.security) != 0) {
+        fprintf(stderr, "Failed to initialize security module\n");
+        goto Error;
+    }
+    printf("DDoS/DoS protection enabled\n");
+
     if (USE_MEMCACHED)
         h2o_multithread_register_receiver(ctx.queue, &libmemcached_receiver, h2o_memcached_receiver);
 

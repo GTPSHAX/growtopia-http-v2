@@ -18,5 +18,36 @@ CMakeUserPresets.json
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #cmake-build-*
 
+# Build outputs
 build/
-lib/
+bin/
+*.o
+*.a
+*.so
+*.dylib
+
+# IDE and editor files
+.vscode/*.log
+.idea/
+*.swp
+*.swo
+*~
+
+# Dependencies
+externals/**/build/
+externals/**/.git/
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Test outputs
+tests/reports/
+*.gcov
+*.gcda
+*.gcno
+
+# Temporary files
+*.tmp
+*.bak
+.cache/

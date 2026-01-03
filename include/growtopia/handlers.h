@@ -7,6 +7,8 @@ extern "C" {
 #endif
 
 h2o_pathconf_t *register_handler(h2o_hostconf_t *hostconf, const char *path, int (*on_req)(h2o_handler_t *, h2o_req_t *));
+h2o_handler_t *register_security_filter(h2o_pathconf_t *pathconf);
+int security_stats_handler(h2o_handler_t *self, h2o_req_t *req);
 int chunked_test(h2o_handler_t *self, h2o_req_t *req);
 int reproxy_test(h2o_handler_t *self, h2o_req_t *req);
 int post_test(h2o_handler_t *self, h2o_req_t *req);
